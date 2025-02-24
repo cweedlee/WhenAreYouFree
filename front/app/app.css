@@ -44,6 +44,8 @@ body {
   --chart-4: hsl(43 74% 66%);
   --chart-5: hsl(27 87% 67%);
   --radius: 0.6rem;
+  --primary: rgb(133, 255, 133);
+  --secondary: rgb(168, 255, 54);
 }
 
 .dark {
@@ -71,6 +73,8 @@ body {
   --chart-3: hsl(30 80% 55%);
   --chart-4: hsl(280 65% 60%);
   --chart-5: hsl(340 75% 55%);
+  --primary: rgb(0, 255, 0);
+  --secondary: rgb(145, 255, 0);
 }
 
 @theme inline {
@@ -111,4 +115,20 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+h1 {
+  @apply text-3xl font-bold;
+}
+
+h2 {
+  @apply text-2xl font-bold;
+}
+
+p {
+  @apply text-base mt-4;
+}
+
+li {
+  @apply mt-1;
 }

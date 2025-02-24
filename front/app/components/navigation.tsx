@@ -1,15 +1,13 @@
 import type { MouseEventHandler } from "react";
 import { Link } from "react-router";
-import { cn } from "~/lib/utils";
 import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuList,
   NavigationMenuTrigger,
 } from "~/ui/navigation-menu";
 
-const itemStyle = "list-none margin-10 padding-10 align-center";
+const itemStyle = "list-none align-center my-auto";
 
 const Item = ({
   title,
@@ -23,7 +21,7 @@ const Item = ({
   className?: string;
 }) => {
   return (
-    <NavigationMenuItem className={cn(itemStyle, className)}>
+    <div className={itemStyle}>
       {to ? (
         <Link to={to}>{title}</Link>
       ) : onClick ? (
@@ -31,19 +29,21 @@ const Item = ({
       ) : (
         <button>{title}</button>
       )}
-    </NavigationMenuItem>
+    </div>
   );
 };
 
 const Navigation = () => (
-  <nav className="flex w-full max-w-full backdrop-blur h-10 top-0 left-0 bg-red-400/20 gap-4 px-10 z-50 justify-between">
-    <Item title="WhenRUfree" to="/" className="font-black " />
+  <nav className="flex w-full max-w-full backdrop-blur h-10 top-0 left-0 bg-red-400/20 gap-4 px-5 z-50 justify-between">
+    <Link to="/" className="font-black align-center justify-center my-auto">
+      WhenRUfree
+    </Link>
     <NavigationMenu>
       <NavigationMenuItem className="list-none bg-transparent">
         <NavigationMenuTrigger className="bg-transparent hover:bg-accent focus:bg-accent">
           menu
         </NavigationMenuTrigger>
-        <NavigationMenuContent className="p-10 flex-col bg-amber-400">
+        <NavigationMenuContent className="p-20 flex-col flex bg-accent  top-10 gap-10 justify-center text-center backdrop-blur ">
           <Item title="Create Event" to="/create" />
           <Item title="infomation" to="/info" />
         </NavigationMenuContent>
