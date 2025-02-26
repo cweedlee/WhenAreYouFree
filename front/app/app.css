@@ -126,7 +126,7 @@ h2 {
 }
 
 p {
-  @apply text-base mt-4;
+  @apply text-base;
 }
 
 li {
