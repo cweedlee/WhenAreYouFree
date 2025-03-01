@@ -3,10 +3,7 @@ const User = require("../models/User");
 async function createUser(data, authority, eventId, session) {
   if (authority === "guest") {
     if (await User.findOne({ username })) {
-      throw new Error({
-        message: "User: create fail: duplication",
-        errorCode: 409,
-      });
+      throw new Error("409 Username already exists");
     }
   }
   const user = new User({
@@ -16,15 +13,18 @@ async function createUser(data, authority, eventId, session) {
     eventId: eventId,
     authority: authority,
   });
-  await user.save({ session }).catch((err) => {
-    throw new Error("User: create fail: ");
+  await user.save({ session }).catch(() => {
+    throw new Error("500 User create fail");
   });
   return user;
 }
 
 async function updateUserEvent(user, eventId) {
   user.eventId = eventId;
-  await user.save();
+  // user
+  await user.save({ session }).catch(() => {
+    throw new Error("500 User create fail");
+  });
 }
 
 async function updateUser(data, userId) {

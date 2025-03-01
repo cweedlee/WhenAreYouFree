@@ -8,6 +8,7 @@ require("./models/User");
 require("./models/Schedule");
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 mongoose
@@ -22,14 +23,42 @@ mongoose
 const eventRoutes = require("./routes/eventRoutes");
 // const userRoutes = require("./routes/userRoutes");
 
-app.use((req, res, next) => {
+// session start
+app.use(async (req, res, next) => {
   console.log(`📢 [${new Date().toISOString()}] ${req.method} ${req.url}`);
+  if (req.method !== "get") {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    req.session = session;
+    console.log("🔵 세션 시작");
+  }
   next();
 });
 
-// 📌 라우터 사용
+// routes
 app.use("/api/events", eventRoutes);
-// app.use("/api/users", userRoutes); // 유저 API 추가 가능
+
+// session end
+app.use(async (req, res) => {
+  if (req.session) {
+    await req.session.commitTransaction();
+    req.session.endSession();
+    console.log("🔵 session closed OK");
+  }
+});
+
+// error handler
+app.use(async (err, req, res, next) => {
+  if (req.session) {
+    await req.session.abortTransaction();
+    req.session.endSession();
+    console.log("🔴 session closed notOK");
+  }
+
+  console.error(err);
+  let status = +err?.message.slice(0, 3) || 500;
+  res.status(status).json({ message: err?.message.slice(4) || err });
+});
 
 const PORT = process.env.PORT || 9000;
 app.listen(PORT, () =>
