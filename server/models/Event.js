@@ -1,7 +1,6 @@
 const BASE = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-
 const mongoose = require("mongoose");
-const bs62 = require("base-x")(BASE);
+const bs62 = require("@multiformats/base-x")(BASE);
 
 const EventSchema = new mongoose.Schema({
   eventName: { type: String, required: true },
@@ -17,19 +16,7 @@ const EventSchema = new mongoose.Schema({
 
 // 이벤트 공유용 코드 생성
 EventSchema.pre("save", async function (next) {
-  if (this.eventCode) return next();
-
-  let unique = false;
-  let eventCode = "";
-
-  while (!unique) {
-    eventCode = bs62
-      .encode(this.eventName + Date.now() + Math.random().toString.Slice(0, 3))
-      .slice(3, 10);
-    const isExist = await this.constructor.findOne({ eventCode });
-    if (!isExist) unique = true;
-  }
-  this.eventCode = eventCode;
+  console.log("pre save");
   next();
 });
 

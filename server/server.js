@@ -5,6 +5,7 @@ require("dotenv").config();
 //Models
 require("./models/Event");
 require("./models/User");
+require("./models/Schedule");
 
 const app = express();
 app.use(express.json());
@@ -19,11 +20,16 @@ mongoose
 
 // 📌 routes 폴더에 있는 파일을 불러오기
 const eventRoutes = require("./routes/eventRoutes");
-const userRoutes = require("./routes/userRoutes"); // 추가 가능
+// const userRoutes = require("./routes/userRoutes");
+
+app.use((req, res, next) => {
+  console.log(`📢 [${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
 
 // 📌 라우터 사용
 app.use("/api/events", eventRoutes);
-app.use("/api/users", userRoutes); // 유저 API 추가 가능
+// app.use("/api/users", userRoutes); // 유저 API 추가 가능
 
 const PORT = process.env.PORT || 9000;
 app.listen(PORT, () =>
