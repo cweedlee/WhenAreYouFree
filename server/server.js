@@ -38,9 +38,13 @@ app.use(async (req, res, next) => {
 // routes
 app.use("/api/events", eventRoutes);
 
-// session end
 app.use(async (req, res) => {
-  if (req.session) {
+  // 404 not found - api has not returned a response
+  if (!res.headersSent) {
+    res.status(404).json({ message: "404 NOT FOUND" });
+  }
+  // session end
+  else if (req.session) {
     await req.session.commitTransaction();
     req.session.endSession();
     console.log("🔵 session closed OK");

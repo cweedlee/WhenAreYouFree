@@ -8,6 +8,7 @@ async function getByEventCode(eventCode) {
   if (!event) {
     throw new Error("404 Event not found");
   }
+  console.log(event);
   return event;
 }
 
