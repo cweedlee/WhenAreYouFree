@@ -8,9 +8,17 @@ export default function LoginPage() {
 
   const onSubmit = (data: FieldValues) => {
     console.log(data);
-    api.post("/login", data as URLSearchParams).then((res) => {
-      console.log(res);
-    });
+    api
+      .post("/user/login", data as URLSearchParams, undefined, {
+        withCredntials: true,
+      })
+      .then((res) => {
+        console.log(res);
+        console.log(res.headers.refresh);
+
+        console.log(res.headers.authorization);
+        api.setToken(res.headers.authorization);
+      });
   };
 
   return (

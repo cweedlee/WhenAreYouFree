@@ -6,10 +6,7 @@ const generateToken = (user) => {
     userId: user._id,
     eventCode: user.eventCode,
   };
-  return {
-    token: jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1800s" }),
-    refresh: jwt.sign({}, process.env.JWT_SECRET, { expiresIn: "1d" }),
-  };
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1800s" });
 };
 
 const generateRefresh = () => {
@@ -30,9 +27,29 @@ const verifyToken = (token) => {
   return decoded;
 };
 
+/////////
+
+const check = (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new Error("401: No token");
+  }
+  const user = verifyToken(token);
+  req.user = user;
+  next();
+};
+
+const getToken = (req, res, next) => {
+  // const token;
+};
+
+const create = (user) => {
+  const token = generateToken(user);
+  const refresh = generateRefresh();
+  return { token, refresh };
+};
+
 module.exports = {
-  generateToken,
-  generateRefresh,
-  isValidRefresh,
-  verifyToken,
+  check,
+  create,
 };

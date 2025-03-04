@@ -14,6 +14,7 @@ async function createEvent(data, hostId, eventCode, session) {
     updated: new Date(),
   });
   await newEvent.save({ session }).catch((err) => {
+    console.log("Event create fail, error", err);
     throw new Error("Event: create fail");
   });
   return newEvent;

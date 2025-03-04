@@ -1,9 +1,10 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: import.meta.env.VITE_API_ENDPOINT,
   headers: {
     "Content-Type": "application/x-www-form-urlencoded",
+    withCredentials: true,
   },
   timeout: 1000,
 });
@@ -19,7 +20,7 @@ const api = {
     url: string,
     data: URLSearchParams | JSON,
     query?: { [key: string]: string },
-    config?: { [key: string]: string }
+    config?: { [key: string]: string | boolean }
   ) => {
     if (query) {
       url += "?" + new URLSearchParams(query).toString();
@@ -36,7 +37,7 @@ const api = {
     url: string,
     data: URLSearchParams | JSON,
     query?: { [key: string]: string },
-    config?: { [key: string]: string }
+    config?: { [key: string]: string | boolean }
   ) => {
     if (query) {
       url += "?" + new URLSearchParams(query).toString();

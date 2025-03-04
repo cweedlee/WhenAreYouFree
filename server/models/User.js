@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  email: { type: String },
+  username: { type: String, required: true, unique: true },
+  email: { type: String, uniquie: true },
   password: { type: String, required: true }, // hashing
   eventId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }],
   authority: { type: String, enum: ["user", "host", "admin"], default: "user" },

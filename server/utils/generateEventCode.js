@@ -11,13 +11,13 @@ async function generateEventCode(text) {
     const length = 7;
     while (duplication && ++cnt < 100) {
       eventCode = bs62
-        .encode(Buffer.from(text[0] + Math.random().toString()))
+        .encode(Buffer.from(Math.random().toString()))
         .slice(3, length + 3);
       duplication = await Event.findOne({ eventCode });
       console.log("duplication", duplication, "eventCode", eventCode);
     }
     if (duplication) {
-      throw new Error("500 generateEventCode error");
+      throw new Error("500 generateEventCode duplicated error");
     }
     return eventCode;
   } catch (err) {

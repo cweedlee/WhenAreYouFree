@@ -5,7 +5,7 @@
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev",
-    "start": "react-router-serve ./build/server/index.js",
+    "start": "react-router-serve ./build/server/index.js --ssl-cert ./localhost.pem --ssl-key ./localhost-key.pem -l 80",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "classname": "^0.0.0",
     "clsx": "^2.1.1",
     "isbot": "^5.1.17",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

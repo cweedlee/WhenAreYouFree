@@ -10,11 +10,11 @@ router.post("", async (req, res, next) => {
   try {
     utils.checkContentType(req, "application/x-www-form-urlencoded");
     const data = req.body;
+    console.log(data);
     const session = req.session;
     const host = await createUser(data, "host", null, session);
     const eventCode = await utils.generateEventCode(data.eventName);
     const event = await createEvent(data, host._id, eventCode, session);
-
     res
       .status(201)
       .json({ message: "Event: create success", eventCode: event.eventCode });

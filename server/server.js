@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 require("dotenv").config();
+const cookieParser = require("cookie-parser");
 
 //Models
 require("./models/Event");
@@ -10,6 +12,7 @@ require("./models/Schedule");
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -21,7 +24,19 @@ mongoose
 
 // 📌 routes 폴더에 있는 파일을 불러오기
 const eventRoutes = require("./routes/eventRoutes");
-// const userRoutes = require("./routes/userRoutes");
+const userRoutes = require("./routes/userRoutes");
+
+//cors
+//DEVELOPMENT ONLY
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    Credentials: true,
+    exposedHeaders: ["authorization", "refresh"],
+    sameSite: "none",
+    secure: false,
+  })
+);
 
 // session start
 app.use(async (req, res, next) => {
@@ -36,7 +51,8 @@ app.use(async (req, res, next) => {
 });
 
 // routes
-app.use("/api/events", eventRoutes);
+app.use("/api/event", eventRoutes);
+app.use("/api/user", userRoutes);
 
 app.use(async (req, res) => {
   // 404 not found - api has not returned a response
