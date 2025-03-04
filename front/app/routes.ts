@@ -6,4 +6,5 @@ export default [
   route("create", "routes/create-page.tsx"),
   // route("host", "routes/host.tsx"),
   // route("guest", "routes/guest.tsx"),
+  route("login", "routes/login-page.tsx"),
 ] satisfies RouteConfig;
