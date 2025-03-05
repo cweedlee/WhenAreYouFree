@@ -1,10 +1,12 @@
 import { useForm, type FieldValues } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import api from "~/utils/api";
 
 export default function LoginPage() {
   const form = useForm({ mode: "onBlur" });
+  const navigate = useNavigate();
 
   const onSubmit = (data: FieldValues) => {
     console.log(data);
@@ -13,11 +15,9 @@ export default function LoginPage() {
         withCredntials: true,
       })
       .then((res) => {
-        console.log(res);
-        console.log(res.headers.refresh);
-
-        console.log(res.headers.authorization);
+        console.log(res.data);
         api.setToken(res.headers.authorization);
+        navigate("/event/" + res.data.eventCode);
       });
   };
 

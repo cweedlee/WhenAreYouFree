@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-const bycrypt = require("bcrypt");
 
 const ScheduleSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  username: { type: String, required: true },
   eventId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Event",
@@ -12,4 +12,5 @@ const ScheduleSchema = new mongoose.Schema({
   scheduleEnd: { type: Date, required: true },
 });
 
-module.exports = mongoose.model("Schedule", ScheduleSchema);
+module.exports =
+  mongoose.model.Schedule || mongoose.model("Schedule", ScheduleSchema);

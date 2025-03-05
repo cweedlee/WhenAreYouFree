@@ -46,4 +46,11 @@ async function updateEvent(data, eventCode, session) {
   );
 }
 
+async function getParticipants(eventId) {
+  const paricipants = User.find({ eventId: eventId }).catch((err) => {
+    console.log("Participants not found, error", err);
+    throw new Error("404 Participants not found");
+  });
+  return paricipants;
+}
 module.exports = { createEvent, updateEvent };

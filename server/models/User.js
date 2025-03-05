@@ -5,8 +5,10 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, uniquie: true },
   password: { type: String, required: true }, // hashing
-  eventId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }],
+  eventId: { type: mongoose.Schema.Types.ObjectId, ref: "Event" },
+  eventCode: { type: String },
   authority: { type: String, enum: ["user", "host", "admin"], default: "user" },
+  schedule: [{ type: mongoose.Schema.Types.ObjectId, ref: "Schedule" }],
 });
 
 // 🔹 비밀번호 저장 전 해싱 처리

@@ -4,3 +4,5 @@
 node_modules
 
 migrate-mongo-config.js
+
+init.js

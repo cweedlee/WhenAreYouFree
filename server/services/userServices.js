@@ -25,7 +25,7 @@ async function updateUser(data, userId) {
     username: data.username || user.username,
     email: data.email || user.email,
     password: data.password || user.password,
-    eventId: data.eventId || user.eventId,
+    eventCode: data.eventcode || user.eventId,
     authority: data.authority || user.authority,
   };
   await Event.updateOne({ _id: user._id }, updated, { session }).catch(
@@ -37,4 +37,21 @@ async function updateUser(data, userId) {
   return user;
 }
 
-module.exports = { createUser, updateUser };
+async function updateEventCode(user, eventCode, eventId, session) {
+  user.eventCode = eventCode;
+  user.eventId = eventId;
+  await User.updateOne({ _id: user._id }, user, { session }).catch((err) => {
+    console.log("User update fail, error", err);
+    throw new Error("500 User update fail");
+  });
+  return user;
+}
+
+async function getUserById(userId) {
+  return await User.findById(userId).catch((err) => {
+    console.log("User not found, error", err);
+    throw new Error("404 User not found");
+  });
+}
+
+module.exports = { createUser, updateUser, updateEventCode, getUserById };

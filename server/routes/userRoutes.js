@@ -29,8 +29,7 @@ router.post("/login", async (req, res, next) => {
     return next(Error("401 Invalid credentials"));
   }
   const { token, refresh } = auth.create(user);
-  console.log("token", token);
-  console.log("refresh", refresh);
+  console.log("code", user);
   res.setHeader("authorization", token);
   res.setHeader("refresh", refresh);
   //DEV
@@ -39,7 +38,10 @@ router.post("/login", async (req, res, next) => {
   //   secure: false,
   //   sameSite: "none",
   // });
-  res.status(200).json({ message: "Login success" }).end();
+  res
+    .status(200)
+    .json({ message: "Login success", eventCode: user.eventCode })
+    .end();
   next();
 });
 
