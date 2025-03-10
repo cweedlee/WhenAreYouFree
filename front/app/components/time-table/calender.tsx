@@ -1,6 +1,6 @@
 import type { EventType } from "~/types/eventTypes";
 import "./calender.css";
-import { useEffect, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import c from "./control";
 interface SchedulePosition extends CSSProperties {
   s?: number;
@@ -13,6 +13,8 @@ function TimeTable({ event }: { event: EventType }) {
   let day: number = start.getDay();
   let headerHeight = 2;
   const schedules = getSchedules();
+  const popup = useRef<HTMLDivElement>(null);
+  const isTarget = useRef<HTMLDivElement>(null);
 
   const duration = c.createDateArray(start, end, schedules);
   function getSchedules() {
@@ -77,23 +79,70 @@ function TimeTable({ event }: { event: EventType }) {
     return date.getHours() * 2 + date.getMinutes() / 30 + headerHeight - 1;
   }
 
+  function ctrlPopup(e: React.MouseEvent) {
+    e.preventDefault();
+    const target = e.target as HTMLDivElement;
+    if (!popup.current) return;
+    popup.current.style.top = `${e.clientY + 10}px`;
+    popup.current.style.left = `${e.clientX + 10}px`;
+    if (target.className !== "schedule") return;
+
+    if (!isTarget.current) {
+      isTarget.current = target;
+      console.log("show");
+      const start = target.getAttribute("data-start");
+      const end = target.getAttribute("data-end");
+      const user = target.getAttribute("data-user");
+      popup.current.innerHTML = `
+      <div class="popup">
+      <div class="popup-header">
+      <div class="header-block">${user}</div>
+      </div>
+      <div class="popup-content">
+      <div class="content-block">${start}</div>
+      <div class="content-block">${end}</div>
+      </div>
+      </div>
+      `;
+      popup.current.style.opacity = "1";
+    }
+  }
+  function onTargetLeave(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!popup.current) return;
+    if (popup.current.style.opacity === "0") return;
+    isTarget.current = null;
+    setTimeout(() => {
+      if (!popup.current || isTarget.current) return;
+      popup.current.style.opacity = "0";
+    }, 100);
+  }
+
   // check userData
-  useEffect(() => {}, []);
+  useEffect(() => {
+    popup.current = document.getElementById("schedule-popup") as HTMLDivElement;
+    popup.current.style.opacity = "0";
+  }, []);
   return (
-    <div className="table">
-      <div className="time">
+    <div className="table" onMouseMove={ctrlPopup}>
+      <div className="time-container">
         <div className="time-header">
-          <div className="header-block">year</div>
+          {start.getFullYear()}년{start.getMonth()}월
         </div>
         {[...Array(24).keys()].map((i, key) => (
-          <div className="w-[3rem] h-[2rem] time" key={key}>
-            {i}
+          <div className="time" key={key}>
+            <p className="time-text">{i + 1}시</p>
           </div>
         ))}
       </div>
-      <div className="content">
+      <div className="date-container">
+        <div className="date-background">
+          {[...Array(24).keys()].map((i, key) => (
+            <div className="time" key={key}></div>
+          ))}
+        </div>
         {duration.map((data, dkey) => (
-          <div className="date-container" key={dkey}>
+          <div className="date-col" key={dkey}>
             <div className={`header-block`}>
               {dayName[day++ % 7]}
               {" " + data.date.getDate()}
@@ -105,22 +154,21 @@ function TimeTable({ event }: { event: EventType }) {
                   <div
                     className="schedule"
                     key={schKey}
-                    style={{ ...sch.position }}
-                    data-key={sch["data-key"]}
+                    style={{
+                      ...sch.position,
+                      opacity: 1 / event.participants.length,
+                    }}
+                    data-user={sch["data-user"]}
                     data-start={sch["data-start"]}
                     data-end={sch["data-end"]}
-                  >
-                    {sch["data-user"]}
-                    <br></br>
-                    {sch["data-start"]}
-                    <br></br>
-                    {sch["data-end"]}
-                  </div>
+                    onMouseOut={onTargetLeave}
+                  />
                 ))}
             </div>
           </div>
         ))}
       </div>
+      <div id="schedule-popup" ref={popup}></div>
     </div>
   );
 }
