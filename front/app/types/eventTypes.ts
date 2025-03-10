@@ -3,5 +3,6 @@ export interface EventType {
   host: string;
   durationStart: string;
   durationEnd: string;
-  participants: { [key: string]: { start: string; end: string }[] };
+  participants: string[];
+  schedules: { user: string; start: string; end: string; key?: string }[];
 }
