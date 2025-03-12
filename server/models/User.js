@@ -7,7 +7,11 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true }, // hashing
   eventId: { type: mongoose.Schema.Types.ObjectId, ref: "Event" },
   eventCode: { type: String },
-  authority: { type: String, enum: ["user", "host", "admin"], default: "user" },
+  authority: {
+    type: String,
+    enum: ["guest", "host", "admin"],
+    default: "user",
+  },
   schedule: [{ type: mongoose.Schema.Types.ObjectId, ref: "Schedule" }],
 });
 

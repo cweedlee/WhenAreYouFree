@@ -12,7 +12,7 @@ export default function EventPage(_: { params: { eventCode: string } }) {
   console.log(_.params);
   const eventCode = _.params.eventCode;
   // const [event, setEvent] = useState<EventType | null>(null);
-  // OFFLINE TEST
+  // // OFFLINE TEST
   const [event, setEvent] = useState<EventType | null>({
     eventName: "Event",
     host: "host",

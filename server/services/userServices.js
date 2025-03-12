@@ -1,8 +1,9 @@
 const User = require("../models/User");
 
 async function createUser(data, authority, eventId, session) {
+  // console.log(data);
   if (authority === "guest") {
-    if (await User.findOne({ username })) {
+    if (await User.findOne({ username: data.username })) {
       throw new Error("409 Username already exists");
     }
   }

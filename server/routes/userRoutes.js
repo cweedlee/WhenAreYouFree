@@ -4,6 +4,9 @@ const auth = require("../utils/auth");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
+const userUtil = require("../services/userServices");
+const scheduleUtil = require("../services/scheduleServices");
+const eventUtil = require("../services/eventServices");
 
 router.get("", async (req, res, next) => {
   const username = req.query?.username;
@@ -43,6 +46,40 @@ router.post("/login", async (req, res, next) => {
     .json({ message: "Login success", eventCode: user.eventCode })
     .end();
   next();
+});
+
+//회원가입
+router.post("/register", async (req, res, next) => {
+  try {
+    //validation
+    const { username, password, email, schedule } = req.body;
+    if (!username || !password || !schedule) {
+      return next(Error("400 Invalid request"));
+    }
+    const eventCode = req.query?.eventCode;
+    const eventId = await eventUtil.getEventIdByEventCode(eventCode);
+    console.log(username, password, email, schedule, eventId);
+    //create user
+    const user = await userUtil.createUser(
+      { username: username, password: password, email: email },
+      "guest",
+      eventId,
+      req.session
+    );
+
+    //create schedule
+    await scheduleUtil.createSchedule(
+      schedule,
+      user._id,
+      eventId,
+      username,
+      req.session
+    );
+    res.status(201).json({ message: "User: create success" });
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;

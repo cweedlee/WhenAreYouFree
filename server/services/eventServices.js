@@ -53,4 +53,18 @@ async function getParticipants(eventId) {
   });
   return paricipants;
 }
-module.exports = { createEvent, updateEvent };
+
+async function getEventIdByEventCode(eventCode) {
+  const event = await Event.findOne({ eventCode: eventCode }).catch((err) => {
+    console.log("Event not found, error", err);
+    throw new Error("404 Event not found");
+  });
+  return event._id;
+}
+
+module.exports = {
+  createEvent,
+  updateEvent,
+  getParticipants,
+  getEventIdByEventCode,
+};

@@ -1,18 +1,30 @@
+const { startSession } = require("../models/Event");
 const Schedule = require("../models/Schedule");
 
-async function createSchedule(data, userId, eventId, username, session) {
-  const newSchedule = new Schedule({
-    userId: userId,
-    eventId: eventId,
-    username: username,
-    scheduleStart: new Date(data.scheduleStart),
-    scheduleEnd: new Date(data.scheduleEnd),
-  });
-  await newSchedule.save({ session }).catch((err) => {
-    console.log("Schedule create fail, error", err);
-    throw new Error("Schedule: create fail");
-  });
-  return newSchedule;
+async function createSchedule(text, userId, eventId, username, session) {
+  const data = JSON.parse(text);
+  let start, end;
+  try {
+    data.map(async (d) => {
+      start = new Date(d.start);
+      end = new Date(d.end);
+      console.log(d);
+      console.log(start, typeof start);
+      const newSchedule = new Schedule({
+        userId: userId,
+        eventId: eventId,
+        username: username,
+        scheduleStart: start,
+        scheduleEnd: end,
+      });
+      await newSchedule.save({ session }).catch((err) => {
+        console.log("Schedule create fail, error", err);
+        throw new Error("500 Schedule: create fail");
+      });
+    });
+  } catch (error) {
+    throw new Error("400 Schedule: create fail");
+  }
 }
 
 async function getSchedulesByEvent(eventId) {
@@ -46,17 +58,20 @@ async function deleteScheduleByUser(userId) {
 }
 
 async function getSchedulesByEventFormatted(eventId) {
+  //1. get schedules by event
   const schedule = await Schedule.find({ eventId: eventId })
     .lean()
     .catch((err) => {
       console.log("Schedules not found, error", err);
       throw new Error("500 Schedules Server Error : find by event");
     });
-  const data = schedule.reduce((acc, s) => {
-    acc[s.userId] = { start: s.scheduleStart, end: s.scheduleEnd };
-    return acc;
-  }, {});
-  return data;
+  // const data = schedule.reduce((acc, s) => {
+  //   acc[s.userId] = { start: s.scheduleStart, end: s.scheduleEnd };
+  //   return acc;
+  // }, {});
+  console.log(schedule);
+
+  return schedule;
 }
 
 module.exports = {
