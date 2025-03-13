@@ -5,4 +5,9 @@ export interface EventType {
   durationEnd: string;
   participants: string[];
   schedules: { user: string; start: string; end: string; key?: string }[];
+  availableTime?: {
+    start: Number;
+    end: Number;
+  };
 }
+[];

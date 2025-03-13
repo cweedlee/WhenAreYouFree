@@ -1,5 +1,3 @@
-import type { tableType } from "./type";
-
 function createDateArray(start: Date, end: Date, schedules: any) {
   const dateArray = [];
 
@@ -23,20 +21,5 @@ function createDateArray(start: Date, end: Date, schedules: any) {
 
   return dateArray;
 }
-const createBlockList = (dateArr: Date[]) => {
-  let blockCount = 0;
-  const blockTable: tableType = {};
-  dateArr.forEach((date) => {
-    const yy = date.getFullYear();
-    const mm = date.getMonth();
-    const dd = date.getDate();
 
-    if (!blockTable[yy]) blockTable[yy] = {};
-    if (!blockTable[yy][mm]) blockTable[yy][mm] = {};
-    if (!blockTable[yy][mm][dd]) blockTable[yy][mm][dd] = null;
-  });
-  console.log(blockTable);
-  return { blockTable, blockCount };
-};
-
-export default { createDateArray, createBlockList };
+export default { createDateArray };

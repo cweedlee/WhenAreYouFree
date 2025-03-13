@@ -6,17 +6,21 @@ interface SchedulePosition extends CSSProperties {
   s?: number;
 }
 
+const dayName = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
+const headerHeight = 2;
+function getHeight(date: Date) {
+  return date.getHours() * 2 + date.getMinutes() / 30 + headerHeight - 2;
+}
+
 function TimeTable({ event }: { event: EventType }) {
   const start = new Date(event.durationStart);
   const end = new Date(event.durationEnd);
-  const dayName = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
   let day: number = start.getDay();
-  let headerHeight = 2;
   const schedules = getSchedules();
   const popup = useRef<HTMLDivElement>(null);
   const isTarget = useRef<HTMLDivElement>(null);
-
   const duration = c.createDateArray(start, end, schedules);
+
   function getSchedules() {
     const schedules = [];
     for (const schedule of event.schedules) {
@@ -75,9 +79,6 @@ function TimeTable({ event }: { event: EventType }) {
     }
     return res;
   }
-  function getHeight(date: Date) {
-    return date.getHours() * 2 + date.getMinutes() / 30 + headerHeight - 1;
-  }
 
   function ctrlPopup(e: React.MouseEvent) {
     e.preventDefault();
@@ -129,11 +130,13 @@ function TimeTable({ event }: { event: EventType }) {
         <div className="time-header">
           {start.getFullYear()}년{start.getMonth()}월
         </div>
-        {[...Array(24).keys()].map((i, key) => (
-          <div className="time" key={key}>
-            <p className="time-text">{i + 1}시</p>
-          </div>
-        ))}
+        <div className="time-col">
+          {[...Array(24).keys()].map((i, key) => (
+            <div className="time" key={key}>
+              <p className="time-text">{i + 1}시</p>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="date-container">
         <div className="date-background">
