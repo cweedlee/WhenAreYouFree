@@ -1,30 +1,52 @@
 const { startSession } = require("../models/Event");
 const Schedule = require("../models/Schedule");
 
-async function createSchedule(text, userId, eventId, username, session) {
+async function createSchedule(text, userId, event, username, session) {
   const data = JSON.parse(text);
-  let start, end;
-  try {
+
+  // Use Promise.all to wait for all async operations
+  await Promise.all(
     data.map(async (d) => {
-      start = new Date(d.start);
-      end = new Date(d.end);
-      console.log(d);
-      console.log(start, typeof start);
+      let start, end;
+
+      //1. validate date
+      try {
+        start = new Date(d.start);
+        end = new Date(d.end);
+      } catch (err) {
+        throw new Error("400 Schedule: invalid date");
+      }
+
+      if (
+        start >= end ||
+        start < event.durationStart ||
+        end > event.durationEnd
+      ) {
+        console.log(
+          "start>end",
+          start >= end,
+          "start < durationStart",
+          start,
+          event.durationStart,
+          "end > durationEnd",
+
+          end > event.durationEnd
+        );
+        throw new Error("400 Schedule: invalid date");
+      }
+
+      //2. create schedule
       const newSchedule = new Schedule({
         userId: userId,
-        eventId: eventId,
+        eventId: event._id,
         username: username,
         scheduleStart: start,
         scheduleEnd: end,
       });
-      await newSchedule.save({ session }).catch((err) => {
-        console.log("Schedule create fail, error", err);
-        throw new Error("500 Schedule: create fail");
-      });
-    });
-  } catch (error) {
-    throw new Error("400 Schedule: create fail");
-  }
+
+      await newSchedule.save({ session });
+    })
+  );
 }
 
 async function getSchedulesByEvent(eventId) {

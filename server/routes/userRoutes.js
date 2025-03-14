@@ -36,11 +36,11 @@ router.post("/login", async (req, res, next) => {
   res.setHeader("authorization", token);
   res.setHeader("refresh", refresh);
   //DEV
-  // res.cookie("authorization", token, {
-  //   httpOnly: true,
-  //   secure: false,
-  //   sameSite: "none",
-  // });
+  res.cookie("authorization", token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "none",
+  });
   res
     .status(200)
     .json({ message: "Login success", eventCode: user.eventCode })
@@ -57,25 +57,26 @@ router.post("/register", async (req, res, next) => {
       return next(Error("400 Invalid request"));
     }
     const eventCode = req.query?.eventCode;
-    const eventId = await eventUtil.getEventIdByEventCode(eventCode);
-    console.log(username, password, email, schedule, eventId);
+    const event = await eventUtil.getEventByEventCode(eventCode);
     //create user
     const user = await userUtil.createUser(
       { username: username, password: password, email: email },
       "guest",
-      eventId,
+      event._id,
       req.session
     );
 
     //create schedule
-    await scheduleUtil.createSchedule(
+    const new_schedule = await scheduleUtil.createSchedule(
       schedule,
       user._id,
-      eventId,
+      event,
       username,
       req.session
     );
-    res.status(201).json({ message: "User: create success", user });
+    res
+      .status(201)
+      .json({ message: "User: create success", user, new_schedule });
     next();
   } catch (error) {
     next(error);
