@@ -75,7 +75,7 @@ router.post("/register", async (req, res, next) => {
       username,
       req.session
     );
-    res.status(201).json({ message: "User: create success" });
+    res.status(201).json({ message: "User: create success", user });
     next();
   } catch (error) {
     next(error);

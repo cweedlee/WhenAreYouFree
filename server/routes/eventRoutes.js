@@ -45,10 +45,13 @@ router.get("", async (req, res, next) => {
   console.log(eventCode);
   try {
     const event = await utils.getByEventCode(eventCode);
-    const participants = await scheduleUtil.getSchedulesByEventFormatted(
-      event.host
+    const schedules = await scheduleUtil.getSchedulesByEventFormatted(
+      event._id
     );
     const host = await userUtil.getUserById(event.host);
+    const participants = await userUtil.getParticipantsByEvent(event._id);
+    console.log(participants);
+    console.log(schedules);
     res.status(200).json({
       event: {
         eventName: event.eventName,
@@ -59,6 +62,7 @@ router.get("", async (req, res, next) => {
         created: event.created,
         updated: event.updated,
         participants,
+        schedules,
       },
     });
     next();

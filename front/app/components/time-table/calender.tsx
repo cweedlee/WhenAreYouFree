@@ -12,7 +12,7 @@ function getHeight(date: Date) {
   return date.getHours() * 2 + date.getMinutes() / 30 + headerHeight - 2;
 }
 
-function TimeTable({ event }: { event: EventType }) {
+function TimeTable({ event, mode }: { event: EventType; mode: string }) {
   const start = new Date(event.durationStart);
   const end = new Date(event.durationEnd);
   let day: number = start.getDay();
@@ -25,19 +25,21 @@ function TimeTable({ event }: { event: EventType }) {
     const schedules = [];
     for (const schedule of event.schedules) {
       const position = getSchedulePosition(schedule.start, schedule.end);
+      if (!position) continue;
       for (const pos of position) {
         let s = pos.s;
         delete pos.s;
         schedules.push({
           position: pos,
           "data-day": s,
-          "data-user": schedule.user,
-          "data-key": schedule.key,
+          "data-user": schedule.username,
+          "data-id": schedule.id,
           "data-start": schedule.start,
           "data-end": schedule.end,
         });
       }
     }
+    console.log("positions", schedules);
     return schedules;
   }
 
@@ -49,11 +51,7 @@ function TimeTable({ event }: { event: EventType }) {
     // 기간 및 가로 시작점 구하기
     let i = 0;
     let s, e;
-    if (
-      start.toDateString() > _start.toDateString() ||
-      end.toDateString() < _end.toDateString()
-    )
-      console.log("error: DateString is not in the range");
+    if (start > _start || end < _end) return [{ top: 0, height: 0, s: 0 }];
     while (iter.toDateString() !== _start.toDateString()) {
       i++;
       iter.setDate(iter.getDate() + 1);

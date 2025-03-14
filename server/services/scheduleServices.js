@@ -65,13 +65,14 @@ async function getSchedulesByEventFormatted(eventId) {
       console.log("Schedules not found, error", err);
       throw new Error("500 Schedules Server Error : find by event");
     });
-  // const data = schedule.reduce((acc, s) => {
-  //   acc[s.userId] = { start: s.scheduleStart, end: s.scheduleEnd };
-  //   return acc;
-  // }, {});
   console.log(schedule);
-
-  return schedule;
+  //2. format schedules
+  return schedule.map((s) => ({
+    start: s.scheduleStart,
+    end: s.scheduleEnd,
+    id: s._id,
+    username: s.username,
+  }));
 }
 
 module.exports = {

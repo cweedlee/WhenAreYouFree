@@ -55,4 +55,25 @@ async function getUserById(userId) {
   });
 }
 
-module.exports = { createUser, updateUser, updateEventCode, getUserById };
+async function getParticipantsByEvent(eventId) {
+  console.log(eventId);
+  const users = await User.find({ eventId: eventId }).catch((err) => {
+    console.log("Participants not found, error", err);
+    throw new Error("404 Participants not found");
+  });
+  return users.map((user) => {
+    return {
+      username: user.username,
+      email: user.email,
+      authority: user.authority,
+    };
+  });
+}
+
+module.exports = {
+  createUser,
+  updateUser,
+  updateEventCode,
+  getUserById,
+  getParticipantsByEvent,
+};
