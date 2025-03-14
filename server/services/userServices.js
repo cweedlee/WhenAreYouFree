@@ -12,6 +12,7 @@ async function createUser(data, authority, eventId, session) {
     email: data.email,
     password: data.password,
     eventId: eventId,
+    eventCode: data.eventCode,
     authority: authority,
   });
   await user.save({ session }).catch(() => {

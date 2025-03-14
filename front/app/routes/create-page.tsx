@@ -21,6 +21,8 @@ import {
 } from "~/components/ui/select";
 import api from "~/utils/api";
 import { useNavigate } from "react-router";
+import { useEffect } from "react";
+import Page from "~/components/page";
 
 const formSchema = z.object({
   username: z
@@ -57,11 +59,17 @@ const MyFormField = ({
       render={({ field }) => (
         <FormItem>
           <div className="flex gap-2 ">
-            <FormLabel className="my-auto font-extrabold">{label}</FormLabel>
+            <FormLabel className="my-auto font-extrabold text-gray-500">
+              {label}
+            </FormLabel>
             <FormMessage className="mt-0" />
           </div>
           <FormControl>
-            <Input {...field} {...props} />
+            <Input
+              {...field}
+              {...props}
+              className=" border-r-0 border-l-0 border-t-0  focus:outline-none focus-visible:outline-red-600 focus:bg-accent focus:ring-0"
+            />
           </FormControl>
         </FormItem>
       )}
@@ -160,39 +168,57 @@ export default function CreatePage() {
       navigate(`/event/${res.data.eventCode}`);
     });
   }
+  useEffect(() => {
+    form.setValue("eventDuration", "week");
+  }, []);
   return (
-    <ShadForm {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-4">
-        <MyFormField form={form} name="username" label="created by" />
-        <MyFormField form={form} name="eventName" label="event title" />
-        <MyFormField
-          form={form}
-          name="password"
-          label="password"
-          props={{
-            type: "password",
-            placeholder: "optional",
-            defaultValue: "",
-          }}
+    <Page>
+      <div className="flex flex-col  gap-4 mx-10 lg:mx-20  my-10">
+        <div className="justify-center">
+          <h1 className="text-2xl font-bold">Create Event</h1>
+
+          <ShadForm {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-6 my-4 justify-center"
+            >
+              <MyFormField form={form} name="username" label="created by" />
+              <MyFormField form={form} name="eventName" label="event title" />
+              <MyFormField
+                form={form}
+                name="password"
+                label="password"
+                props={{
+                  type: "password",
+                  placeholder: "optional",
+                  defaultValue: "",
+                }}
+              />
+              <MyFormField form={form} name="email" label="email" />
+              <MyFormSelector
+                form={form}
+                name="eventDuration"
+                label="happens in"
+                options={[
+                  { label: "in 24hr", value: "day" },
+                  { label: "in a week", value: "week" },
+                  { label: "in a month", value: "month" },
+                  { label: "in a year", value: "year" },
+                  { label: "custom", value: "custom" },
+                ]}
+                defaultValue="week"
+              />
+              <Button type="submit" className="bg-primary w-50">
+                create
+              </Button>
+            </form>
+          </ShadForm>
+        </div>
+        <div
+          content="example"
+          className="text-sm text-gray-500 w-full h-30 bg-red-100 "
         />
-        <MyFormField form={form} name="email" label="email" />
-        <MyFormSelector
-          form={form}
-          name="eventDuration"
-          label="happens in"
-          options={[
-            { label: "in 24hr", value: "day" },
-            { label: "in a week", value: "week" },
-            { label: "in a month", value: "month" },
-            { label: "in a year", value: "year" },
-            { label: "custom", value: "custom" },
-          ]}
-          defaultValue="week"
-        />
-        <Button type="submit" className="bg-primary w-full">
-          create
-        </Button>
-      </form>
-    </ShadForm>
+      </div>
+    </Page>
   );
 }

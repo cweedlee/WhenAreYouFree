@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Page from "~/components/page";
 import TimeTable from "~/components/time-table/TimeTable";
 import { Button } from "~/components/ui/button";
 import { Mode, type EventType } from "~/types/eventTypes";
@@ -18,13 +19,22 @@ export default function EventPage(_: { params: { eventCode: string } }) {
     });
   }, []);
   return (
-    <>
+    <Page>
       {event?.durationStart && event ? (
-        <div>
-          <h1>{event.eventName || "Event"}</h1>
-          <h2>{event.host || "host"}</h2>
-          <h3>{event.durationStart || "start"}</h3>
-          <h3>{event.durationEnd || "end"}</h3>
+        <div className="flex flex-col gap-4 mx-10 lg:mx-20  my-10 justify-center text-center">
+          <h1 className="text-2xl font-bold italic">
+            {event.eventName || "Event"}
+          </h1>
+          <div>
+            <h3 className="text-sm text-gray-500">hosted by</h3>
+            <h2 className="text-lg font-bold">{event.host || "host"}</h2>
+          </div>
+          <h3 className="text-sm text-gray-500">
+            {event.durationStart || "start"}
+          </h3>
+          <h3 className="text-sm text-gray-500">
+            {event.durationEnd || "end"}
+          </h3>
 
           <TimeTable event={event} mode={mode} />
           <Button onClick={() => setMode(Mode.CREATE)}>Add Schedule</Button>
@@ -33,6 +43,6 @@ export default function EventPage(_: { params: { eventCode: string } }) {
       ) : (
         <div>loading...</div>
       )}
-    </>
+    </Page>
   );
 }

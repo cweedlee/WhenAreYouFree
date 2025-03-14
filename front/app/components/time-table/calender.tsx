@@ -169,27 +169,10 @@ function Calender({ event, mode }: { event: EventType; mode: Mode }) {
 
   function submitSchedule(e: React.MouseEvent) {
     e.preventDefault();
-    if (!tempSchedule.current) return;
-    const target = e.target as HTMLDivElement;
-    const data = {
-      schedule: JSON.stringify([
-        { start: newSchedule?.start, end: newSchedule?.end },
-      ]),
-      username: "username22",
-      email: "email@g.com",
-      password: "password",
-    };
-    console.log("data", data);
-    api.post(
-      "user/register",
-      new URLSearchParams(data),
-      {
-        eventCode: event.eventCode,
-      },
-      {
-        "Content-Type": "application/x-www-form-urlencoded",
-      }
-    );
+    if (!tempSchedule.current || !newSchedule) return;
+    const data = [{ start: newSchedule.start, end: newSchedule.end }];
+
+    c.postSchedule(event.eventCode, data);
   }
 
   // check userData

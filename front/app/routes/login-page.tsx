@@ -1,5 +1,6 @@
 import { useForm, type FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router";
+import Page from "~/components/page";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import api from "~/utils/api";
@@ -15,25 +16,27 @@ export default function LoginPage() {
         withCredntials: true,
       })
       .then((res) => {
-        console.log(res.data);
         api.setToken(res.headers.authorization);
+        localStorage.setItem("eventCode", res.data.eventCode);
         navigate("/event/" + res.data.eventCode);
       });
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-max max-w-[20rem] min-w-[10rem] px-auto m-[4rem]">
-      <div className="flex bg-accent">
-        <h2>Login</h2>
+    <Page>
+      <div className="min-w-[10rem] w-[60%] mx-auto gap-y-10 flex flex-col">
+        <div className="flex">
+          <h1>Login</h1>
+        </div>
+        <form
+          className="w-full rounded-b-2xl flex flex-col gap-y-4"
+          onSubmit={form.handleSubmit((data) => onSubmit(data))}
+        >
+          <Input {...form.register("username")} placeholder="username" />
+          <Input {...form.register("password")} placeholder="password" />
+          <Button type="submit">Login</Button>
+        </form>
       </div>
-      <form
-        className="w-full rounded-b-2xl"
-        onSubmit={form.handleSubmit((data) => onSubmit(data))}
-      >
-        <Input {...form.register("username")} placeholder="username" />
-        <Input {...form.register("password")} placeholder="password" />
-        <Button type="submit">Login</Button>
-      </form>
-    </div>
+    </Page>
   );
 }

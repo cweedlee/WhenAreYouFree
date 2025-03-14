@@ -1,3 +1,6 @@
+import type { EventType } from "~/types/eventTypes";
+import api from "~/utils/api";
+
 function createDateArray(start: Date, end: Date, schedules: any) {
   const dateArray = [];
 
@@ -21,9 +24,19 @@ function createDateArray(start: Date, end: Date, schedules: any) {
 
   return dateArray;
 }
-function addSchedule(start) {
-  e.preventDefault();
-  console.log("addSchedule");
+function postSchedule(
+  eventCode: string,
+  schedule: { start: string; end: string }[]
+) {
+  api.post(
+    "user/register",
+    new URLSearchParams({
+      schedule: JSON.stringify(schedule),
+      username: "user",
+      email: "email@g.com",
+      password: "password",
+    }),
+    { eventCode }
+  );
 }
-
-export default { createDateArray, addSchedule };
+export default { createDateArray, postSchedule };
