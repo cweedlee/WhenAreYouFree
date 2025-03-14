@@ -21,5 +21,9 @@ function createDateArray(start: Date, end: Date, schedules: any) {
 
   return dateArray;
 }
+function addSchedule(start) {
+  e.preventDefault();
+  console.log("addSchedule");
+}
 
-export default { createDateArray };
+export default { createDateArray, addSchedule };

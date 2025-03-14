@@ -78,6 +78,13 @@
   background-color: green;
   z-index: 5;
 }
+.schedule-others {
+  position: absolute;
+  width: var(--date-w);
+  border: 1px solid #000;
+  font-size: xx-small;
+  background-color: rgb(0, 0, 255);
+}
 
 .time {
   position: sticky;
@@ -99,6 +106,16 @@
 }
 
 #schedule-popup {
+  position: fixed;
+  background-color: thistle;
+  transition: opacity 0.3s ease-in;
+  opacity: 0;
+  top: -100%;
+  left: -100%;
+  z-index: 11;
+}
+
+#schedule-new {
   position: fixed;
   background-color: thistle;
   transition: opacity 0.3s ease-in;

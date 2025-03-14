@@ -1,7 +1,8 @@
-import type { EventType } from "~/types/eventTypes";
+import { Mode, type EventType } from "~/types/eventTypes";
 import "./calender.css";
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import c from "./control";
+import api from "~/utils/api";
 interface SchedulePosition extends CSSProperties {
   s?: number;
 }
@@ -12,7 +13,9 @@ function getHeight(date: Date) {
   return date.getHours() * 2 + date.getMinutes() / 30 + headerHeight - 2;
 }
 
-function TimeTable({ event, mode }: { event: EventType; mode: string }) {
+function Calender({ event, mode }: { event: EventType; mode: Mode }) {
+  console.log("calender mode", mode);
+
   const start = new Date(event.durationStart);
   const end = new Date(event.durationEnd);
   let day: number = start.getDay();
@@ -20,6 +23,15 @@ function TimeTable({ event, mode }: { event: EventType; mode: string }) {
   const popup = useRef<HTMLDivElement>(null);
   const isTarget = useRef<HTMLDivElement>(null);
   const duration = c.createDateArray(start, end, schedules);
+  const dateColStart = useRef<number>(0);
+  const createSchDiv = useRef<HTMLDivElement>(null);
+  const tempSchedule = useRef<HTMLDivElement>(null);
+  const [newSchedule, setNewSchedule] = useState<{
+    start: string;
+    end: string;
+    duration: string;
+    position: SchedulePosition;
+  } | null>(null);
 
   function getSchedules() {
     const schedules = [];
@@ -39,7 +51,6 @@ function TimeTable({ event, mode }: { event: EventType; mode: string }) {
         });
       }
     }
-    console.log("positions", schedules);
     return schedules;
   }
 
@@ -117,13 +128,85 @@ function TimeTable({ event, mode }: { event: EventType; mode: string }) {
     }, 100);
   }
 
+  function addSchedule(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!createSchDiv.current) return;
+    const target = e.target as HTMLDivElement;
+
+    // Get the time (hour) from the clicked element
+    const hour = +(target.getAttribute("data-hour") || -1);
+
+    // Find the parent date column
+    console.log(dateColStart.current);
+    if (!dateColStart.current) return;
+    const date = +(
+      (e.clientX - dateColStart.current) /
+      (parseInt(getComputedStyle(document.documentElement).fontSize) * 5)
+    ).toFixed(0);
+    console.log(date, hour, duration[date].date.toDateString());
+
+    if (!date || date < 0 || hour < 0) return;
+    const _start = new Date(duration[date].date);
+    const _end = new Date(_start);
+    _start.setHours(hour, 0, 0, 0);
+    _end.setHours(hour + 1, 0, 0, 0);
+    const position = getSchedulePosition(_start.toString(), _end.toString());
+    console.log("new position", position);
+    setNewSchedule({
+      start: _start.toLocaleString(),
+      end: _end.toLocaleString(),
+      duration:
+        (_end.getTime() - _start.getTime()) / 1000 / 60 / 60 +
+        "h " +
+        (((_end.getTime() - _start.getTime()) / 1000 / 60) % 60) +
+        "m",
+      position: position[0],
+    });
+    createSchDiv.current.style.opacity = "1";
+    createSchDiv.current.style.top = `${e.clientY + 10}px`;
+    createSchDiv.current.style.left = `${e.clientX + 10}px`;
+  }
+
+  function submitSchedule(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!tempSchedule.current) return;
+    const target = e.target as HTMLDivElement;
+    const data = {
+      schedule: JSON.stringify([
+        { start: newSchedule?.start, end: newSchedule?.end },
+      ]),
+      username: "username22",
+      email: "email@g.com",
+      password: "password",
+    };
+    console.log("data", data);
+    api.post(
+      "user/register",
+      new URLSearchParams(data),
+      {
+        eventCode: event.eventCode,
+      },
+      {
+        "Content-Type": "application/x-www-form-urlencoded",
+      }
+    );
+  }
+
   // check userData
   useEffect(() => {
     popup.current = document.getElementById("schedule-popup") as HTMLDivElement;
     popup.current.style.opacity = "0";
+    let timediv = document.querySelector(".time:first-child") as HTMLDivElement;
+    dateColStart.current =
+      timediv?.getBoundingClientRect().x +
+        timediv?.getBoundingClientRect().width || 0;
   }, []);
   return (
-    <div className="table" onMouseMove={ctrlPopup}>
+    <div
+      className="table"
+      onMouseMove={(e) => mode === Mode.VIEW && ctrlPopup(e)}
+      onClick={addSchedule}
+    >
       <div className="time-container">
         <div className="time-header">
           {start.getFullYear()}년{start.getMonth()}월
@@ -139,7 +222,7 @@ function TimeTable({ event, mode }: { event: EventType; mode: string }) {
       <div className="date-container">
         <div className="date-background">
           {[...Array(24).keys()].map((i, key) => (
-            <div className="time" key={key}></div>
+            <div className="time" key={key} data-hour={i}></div>
           ))}
         </div>
         {duration.map((data, dkey) => (
@@ -153,7 +236,9 @@ function TimeTable({ event, mode }: { event: EventType; mode: string }) {
                 data.schedules.length > 0 &&
                 data.schedules.map((sch, schKey) => (
                   <div
-                    className="schedule"
+                    className={
+                      mode === Mode.VIEW ? "schedule" : "schedule-others"
+                    }
                     key={schKey}
                     style={{
                       ...sch.position,
@@ -170,8 +255,27 @@ function TimeTable({ event, mode }: { event: EventType; mode: string }) {
         ))}
       </div>
       <div id="schedule-popup" ref={popup}></div>
+      <div id="schedule-new" ref={createSchDiv}>
+        <div className="popup-header">
+          <h2>Create Schedule</h2>
+          <button>x</button>
+        </div>
+        <div className="popup-content">
+          <p>{newSchedule?.start}</p>
+          <p>{newSchedule?.end}</p>
+          <p>duration: {newSchedule?.duration}</p>
+          <button onClick={submitSchedule}>Create</button>
+        </div>
+      </div>
+      {newSchedule && (
+        <div
+          className="schedule"
+          ref={tempSchedule}
+          style={newSchedule?.position}
+        ></div>
+      )}
     </div>
   );
 }
 
-export default TimeTable;
+export default Calender;

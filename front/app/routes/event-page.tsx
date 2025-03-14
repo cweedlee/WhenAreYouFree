@@ -1,50 +1,19 @@
 import { useEffect, useState } from "react";
-import TimeTable from "~/components/time-table/calender";
-import type { EventType } from "~/types/eventTypes";
+import TimeTable from "~/components/time-table/TimeTable";
+import { Button } from "~/components/ui/button";
+import { Mode, type EventType } from "~/types/eventTypes";
 import api from "~/utils/api";
-
-interface Participant {
-  start: string;
-  end: string;
-}
 
 export default function EventPage(_: { params: { eventCode: string } }) {
   console.log(_.params);
   const eventCode = _.params.eventCode;
   const [event, setEvent] = useState<EventType | null>(null);
-  // // OFFLINE TEST
-  // const [event, setEvent] = useState<EventType | null>({
-  //   eventName: "Event",
-  //   host: "host",
-  //   durationStart: "2021-11-01T00:00:00",
-  //   durationEnd: "2021-11-03T00:00:00",
-  //   schedules: [
-  //     {
-  //       user: "user1",
-  //       start: "2021-11-01T09:00:00",
-  //       end: "2021-11-01T20:00:00",
-  //     },
-  //     {
-  //       user: "user2",
-  //       start: "2021-11-01T15:00:00",
-  //       end: "2021-11-01T16:00:00",
-  //     },
-  //     {
-  //       user: "user1",
-  //       start: "2021-11-02T10:00:00",
-  //       end: "2021-11-02T11:00:00",
-  //     },
-  //     {
-  //       user: "user2",
-  //       start: "2021-11-02T17:00:00",
-  //       end: "2021-11-02T19:00:00",
-  //     },
-  //   ],
-  //   participants: ["user1", "user2"],
-  // });
+  const [mode, setMode] = useState<Mode>(Mode.VIEW);
+  console.log("mode", mode);
   useEffect(() => {
     api.get("/event/", { eventCode }).then((res) => {
       console.log(res);
+      res.data.event.eventCode = eventCode;
       setEvent(res.data.event);
     });
   }, []);
@@ -57,7 +26,9 @@ export default function EventPage(_: { params: { eventCode: string } }) {
           <h3>{event.durationStart || "start"}</h3>
           <h3>{event.durationEnd || "end"}</h3>
 
-          <TimeTable event={event} mode={"view"} />
+          <TimeTable event={event} mode={mode} />
+          <Button onClick={() => setMode(Mode.CREATE)}>Add Schedule</Button>
+          <Button onClick={() => setMode(Mode.VIEW)}>confirm Schedule</Button>
         </div>
       ) : (
         <div>loading...</div>

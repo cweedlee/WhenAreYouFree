@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import api from "~/utils/api";
+import { useNavigate } from "react-router";
 
 const formSchema = z.object({
   username: z
@@ -116,6 +117,7 @@ const MyFormSelector = ({
 };
 
 export default function CreatePage() {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -155,6 +157,7 @@ export default function CreatePage() {
 
     api.post("/event", new URLSearchParams(data)).then((res) => {
       console.log(res);
+      navigate(`/event/${res.data.eventCode}`);
     });
   }
   return (

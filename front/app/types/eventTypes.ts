@@ -14,5 +14,12 @@ export interface EventType {
     start: Number;
     end: Number;
   };
+  eventCode: string;
 }
 [];
+
+export enum Mode {
+  VIEW,
+  CREATE,
+  EDIT,
+}
