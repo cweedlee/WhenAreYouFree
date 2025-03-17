@@ -18,7 +18,7 @@ const api = {
   },
   post: async (
     url: string,
-    data: URLSearchParams | JSON,
+    data: URLSearchParams | JSON | { [key: string]: string },
     query?: { [key: string]: string },
     config?: { [key: string]: string | boolean }
   ) => {

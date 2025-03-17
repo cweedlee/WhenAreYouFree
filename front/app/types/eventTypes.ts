@@ -3,7 +3,7 @@ export interface EventType {
   host: string;
   durationStart: string;
   durationEnd: string;
-  participants: string[];
+  participants: ParticipantType[];
   schedules: {
     username: string;
     start: string;
@@ -17,6 +17,18 @@ export interface EventType {
   eventCode: string;
 }
 [];
+
+export enum AUTHTYPE {
+  GUEST = "guest",
+  HOST = "host",
+  ADMIN = "admin",
+}
+
+export interface ParticipantType {
+  username?: string;
+  authority: AUTHTYPE;
+  email: string;
+}
 
 export enum Mode {
   VIEW,

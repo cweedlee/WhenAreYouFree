@@ -7,6 +7,7 @@ const InputLabel = ({
   required = false,
   name,
   register,
+  type = "text",
   ...props
 }: {
   label?: string;
@@ -14,23 +15,24 @@ const InputLabel = ({
   required?: boolean;
   name: string;
   register: UseFormRegisterReturn<string>;
+  type?: string;
   props?: React.DetailedHTMLProps<
     React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
   >;
 }) => {
   return (
-    <div className="flex smy-auto gap-4">
+    <div className="flex sm:flex-row flex-col w-full gap-4">
       {label && (
         <label
           htmlFor="input"
-          className="input-label h-full text-sm/8 font-bold"
+          className="input-label h-full w-max min-w-25 text-sm/8 font-bold text-right"
         >
           {label}
           {required && <span className="text-red-500">*</span>}
         </label>
       )}
-      <Input placeholder={placeholder} {...props} {...register} />
+      <Input placeholder={placeholder} {...props} {...register} type={type} />
     </div>
   );
 };

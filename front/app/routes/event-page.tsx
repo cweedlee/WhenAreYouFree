@@ -4,7 +4,9 @@ import TimeTable from "~/components/time-table/TimeTable";
 import { Button } from "~/components/ui/button";
 import { Mode, type EventType } from "~/types/eventTypes";
 import api from "~/utils/api";
-
+import SignUpForm from "../components/SignUpForm";
+import Participants from "~/components/time-table/participants";
+import Loading from "~/components/loading";
 export default function EventPage(_: { params: { eventCode: string } }) {
   console.log(_.params);
   const eventCode = _.params.eventCode;
@@ -18,31 +20,33 @@ export default function EventPage(_: { params: { eventCode: string } }) {
       setEvent(res.data.event);
     });
   }, []);
+
   return (
     <Page>
-      {event?.durationStart && event ? (
-        <div className="flex flex-col gap-4 mx-10 lg:mx-20  my-10 justify-center text-center">
-          <h1 className="text-2xl font-bold italic">
-            {event.eventName || "Event"}
-          </h1>
-          <div>
-            <h3 className="text-sm text-gray-500">hosted by</h3>
-            <h2 className="text-lg font-bold">{event.host || "host"}</h2>
-          </div>
-          <h3 className="text-sm text-gray-500">
-            {event.durationStart || "start"}
-          </h3>
-          <h3 className="text-sm text-gray-500">
-            {event.durationEnd || "end"}
-          </h3>
-
-          <TimeTable event={event} mode={mode} />
-          <Button onClick={() => setMode(Mode.CREATE)}>Add Schedule</Button>
-          <Button onClick={() => setMode(Mode.VIEW)}>confirm Schedule</Button>
+      {!event || !event.host || <Loading />}
+      <div className="flex flex-col gap-4 mx-10 lg:mx-20  my-10 justify-center text-center">
+        <h1 className="text-2xl font-bold italic">
+          {event?.eventName || "Event"}
+        </h1>
+        <div>
+          <h3 className="text-sm text-gray-500">hosted by</h3>
+          <h2 className="text-lg font-bold">{event?.host || "host"}</h2>
         </div>
-      ) : (
-        <div>loading...</div>
-      )}
+        <h3 className="text-sm text-gray-500">
+          {event?.durationStart || "start"}
+        </h3>
+        <h3 className="text-sm text-gray-500">{event?.durationEnd || "end"}</h3>
+        {event && event.host ? (
+          <>
+            <Participants participants={event?.participants} />
+            <TimeTable event={event} mode={mode} />
+          </>
+        ) : null}
+
+        <SignUpForm eventCode={eventCode} />
+        <Button onClick={() => setMode(Mode.CREATE)}>Add Schedule</Button>
+        <Button onClick={() => setMode(Mode.VIEW)}>confirm Schedule</Button>
+      </div>
     </Page>
   );
 }

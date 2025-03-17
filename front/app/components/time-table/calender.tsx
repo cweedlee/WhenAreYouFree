@@ -14,8 +14,6 @@ function getHeight(date: Date) {
 }
 
 function Calender({ event, mode }: { event: EventType; mode: Mode }) {
-  console.log("calender mode", mode);
-
   const start = new Date(event.durationStart);
   const end = new Date(event.durationEnd);
   let day: number = start.getDay();

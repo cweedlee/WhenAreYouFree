@@ -56,8 +56,8 @@ router.post("/login", async (req, res, next) => {
 router.post("/register", async (req, res, next) => {
   try {
     //validation
-    const { username, password, email, schedule } = req.body;
-    if (!username || !password || !schedule) {
+    const { username, password, email } = req.body;
+    if (!email || !password) {
       return next(Error("400 Invalid request"));
     }
     const eventCode = req.query?.eventCode;
@@ -75,17 +75,7 @@ router.post("/register", async (req, res, next) => {
       req.session
     );
 
-    //create schedule
-    const new_schedule = await scheduleUtil.createSchedule(
-      schedule,
-      user._id,
-      event,
-      username,
-      req.session
-    );
-    res
-      .status(201)
-      .json({ message: "User: create success", user, new_schedule });
+    res.status(201).json({ message: "User: create success", user });
     next();
   } catch (error) {
     next(error);
