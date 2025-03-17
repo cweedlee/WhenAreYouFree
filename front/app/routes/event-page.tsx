@@ -9,7 +9,6 @@ import Participants from "~/components/time-table/participants";
 import Loading from "~/components/loading";
 import { useUser } from "~/utils/useUser";
 export default function EventPage(_: { params: { eventCode: string } }) {
-  console.log(_.params);
   const eventCode = _.params.eventCode;
   const [event, setEvent] = useState<EventType | null>(null);
   const [mode, setMode] = useState<Mode>(Mode.VIEW);
@@ -21,6 +20,7 @@ export default function EventPage(_: { params: { eventCode: string } }) {
       setEvent(res.data.event);
     });
   }, []);
+  console.log(event?.host, user?.username);
 
   return (
     <Page>
@@ -37,17 +37,17 @@ export default function EventPage(_: { params: { eventCode: string } }) {
           {event?.durationStart || "start"}
         </h3>
         <h3 className="text-sm text-gray-500">{event?.durationEnd || "end"}</h3>
+        {event && event.host ? (
+          <>
+            <Participants participants={event?.participants} />
+            <TimeTable event={event} mode={mode} />
+          </>
+        ) : null}
         {user && event && user.username === event.host ? (
           <>
             <Button onClick={() => alert("event 수정 기능 개발중")}>
               Edit Event
             </Button>
-          </>
-        ) : null}
-        {event && event.host ? (
-          <>
-            <Participants participants={event?.participants} />
-            <TimeTable event={event} mode={mode} />
           </>
         ) : null}
         {!user && <SignUpForm eventCode={eventCode} />}

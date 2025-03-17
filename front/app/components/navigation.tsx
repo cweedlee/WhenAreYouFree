@@ -1,5 +1,6 @@
-import { useContext, useState, type MouseEventHandler } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
+import api from "~/utils/api";
 import { useUser } from "~/utils/useUser";
 
 const itemStyle = "list-none align-center my-auto px-[2rem] py-4 text-xl";
@@ -16,7 +17,7 @@ const Item = ({
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
   const toggleOpen = () => {
     setIsOpen(!isOpen);
@@ -83,7 +84,8 @@ const Navigation = () => {
                 <button
                   onClick={() => {
                     toggleOpen();
-                    alert("logout 개발중");
+                    api.removeToken();
+                    setUser(null);
                   }}
                   className={itemStyle}
                 >

@@ -1,16 +1,23 @@
+import { useEffect } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router";
 import Page from "~/components/page";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import api from "~/utils/api";
+import useUser from "~/utils/useUser";
 
 export default function LoginPage() {
   const form = useForm({ mode: "onBlur" });
   const navigate = useNavigate();
+  const { user, setUser } = useUser();
+  useEffect(() => {
+    if (user) {
+      navigate("/event/" + user.eventCode);
+    }
+  }, [user]);
 
   const onSubmit = (data: FieldValues) => {
-    console.log(data);
     api
       .post("/user/login", data as URLSearchParams, undefined, {
         withCredntials: true,
@@ -19,6 +26,10 @@ export default function LoginPage() {
         api.setToken(res.headers.authorization);
         localStorage.setItem("eventCode", res.data.eventCode);
         navigate("/event/" + res.data.eventCode);
+        setUser(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
 
