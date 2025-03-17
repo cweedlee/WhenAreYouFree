@@ -21,10 +21,13 @@ const verifyRefresh = (refreshToken) => {
 };
 
 const verifyToken = (token) => {
-  const decoded = jwt.verify(token, process.env.JWT_SECRET).catch((error) => {
+  try {
+    token = token.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded;
+  } catch (error) {
     return false;
-  });
-  return decoded;
+  }
 };
 
 /////////
@@ -52,4 +55,7 @@ const create = (user) => {
 module.exports = {
   check,
   create,
+  verifyToken,
+  verifyRefresh,
+  getToken,
 };

@@ -15,6 +15,15 @@ router.get("", async (req, res, next) => {
   next();
 });
 
+router.get("/self", async (req, res, next) => {
+  if (!req.user) {
+    return next(Error("401 Unauthorized"));
+  }
+  const user = req.user;
+  res.status(200).json(user);
+  next();
+});
+
 router.post("/login", async (req, res, next) => {
   try {
     const { username, password } = req.body;

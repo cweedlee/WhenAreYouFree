@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
+const auth = require("./utils/auth");
 
 //Models
 require("./models/Event");
@@ -46,6 +47,13 @@ app.use(async (req, res, next) => {
     session.startTransaction();
     req.session = session;
     console.log("🔵 세션 시작");
+  }
+  if (req.headers.authorization) {
+    const token = req.headers.authorization;
+    const user = auth.verifyToken(token);
+    if (user) {
+      req.user = user;
+    }
   }
   next();
 });

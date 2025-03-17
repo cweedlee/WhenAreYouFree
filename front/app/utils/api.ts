@@ -48,11 +48,17 @@ const api = {
     instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     localStorage.setItem("token", token);
   },
+  removeToken: () => {
+    instance.defaults.headers.common["Authorization"] = null;
+    localStorage.removeItem("token");
+  },
   restoreToken: () => {
     const token = localStorage.getItem("token");
     if (token) {
       api.setToken(token);
+      return true;
     }
+    return false;
   },
 };
 

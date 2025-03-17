@@ -1,5 +1,6 @@
-import { useState, type MouseEventHandler } from "react";
+import { useContext, useState, type MouseEventHandler } from "react";
 import { Link } from "react-router";
+import { useUser } from "~/utils/useUser";
 
 const itemStyle = "list-none align-center my-auto px-[2rem] py-4 text-xl";
 
@@ -15,6 +16,8 @@ const Item = ({
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useUser();
+
   const toggleOpen = () => {
     setIsOpen(!isOpen);
   };
@@ -23,6 +26,7 @@ const Navigation = () => {
       <Link to="/" className="font-black align-center justify-center my-auto">
         WhenRUfree
       </Link>
+      {user && <p>{user?.username}</p>}
       <img
         src={`${import.meta.env.VITE_URL}/calender.gif`}
         alt="logo"
@@ -49,28 +53,44 @@ const Navigation = () => {
             className="container relative flex-col bg-background/95 w-max h-max z-[60] flex p-[3rem] shadow-md border-1 border-black text-center"
             onClick={toggleOpen}
           >
-            <Link to="/create" className={itemStyle}>
+            <Link
+              to="/create"
+              className={itemStyle}
+              onClick={(e) => {
+                if (user) {
+                  e.preventDefault();
+                  alert(
+                    "User can Get only 1 event right now\nWill be updated soon"
+                  );
+                }
+              }}
+            >
               Create Event
             </Link>
             <Link to="/information" className={itemStyle}>
               infomation/usage
             </Link>
-            <Link to="/login" className={itemStyle}>
-              login
-            </Link>
-
-            <Link to={`/event/`} className={itemStyle}>
-              My Event
-            </Link>
-            <button
-              onClick={() => {
-                toggleOpen();
-                alert("logout 개발중");
-              }}
-              className={itemStyle}
-            >
-              Logout
-            </button>
+            {!user && (
+              <Link to="/login" className={itemStyle}>
+                login
+              </Link>
+            )}
+            {user && (
+              <>
+                <Link to={`/event/${user.eventCode}`} className={itemStyle}>
+                  My Event
+                </Link>
+                <button
+                  onClick={() => {
+                    toggleOpen();
+                    alert("logout 개발중");
+                  }}
+                  className={itemStyle}
+                >
+                  Logout
+                </button>
+              </>
+            )}
             <div
               content="fontSize"
               className={

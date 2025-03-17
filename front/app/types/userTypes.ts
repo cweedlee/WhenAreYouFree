@@ -4,3 +4,9 @@ export type SignUpUserType = {
   email: string;
   eventCode: string;
 };
+
+export type CurrentUserType = {
+  username?: string;
+  email?: string;
+  eventCode?: string;
+};
