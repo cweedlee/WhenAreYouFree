@@ -20,7 +20,7 @@ export default function EventPage(_: { params: { eventCode: string } }) {
       setEvent(res.data.event);
     });
   }, []);
-  console.log(event?.host, user?.username);
+  console.log(event?.host, user?.username, event?.host === user?.username);
 
   return (
     <Page>
@@ -37,17 +37,21 @@ export default function EventPage(_: { params: { eventCode: string } }) {
           {event?.durationStart || "start"}
         </h3>
         <h3 className="text-sm text-gray-500">{event?.durationEnd || "end"}</h3>
+        {user && event && user.username === event.host ? (
+          <>
+            <Button
+              className="w-auto max-w-150 mx-auto min-w-[20rem]"
+              onClick={() => alert("event 수정 기능 개발중")}
+            >
+              Edit Event
+            </Button>
+          </>
+        ) : null}
         {event && event.host ? (
           <>
             <Participants participants={event?.participants} />
+
             <TimeTable event={event} mode={mode} />
-          </>
-        ) : null}
-        {user && event && user.username === event.host ? (
-          <>
-            <Button onClick={() => alert("event 수정 기능 개발중")}>
-              Edit Event
-            </Button>
           </>
         ) : null}
         {!user && <SignUpForm eventCode={eventCode} />}
