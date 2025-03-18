@@ -20,7 +20,6 @@ export default function EventPage(_: { params: { eventCode: string } }) {
       setEvent(res.data.event);
     });
   }, []);
-  console.log(event?.host, user?.username, event?.host === user?.username);
 
   return (
     <Page>

@@ -3,6 +3,9 @@ import "./calender.css";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import c from "./control";
 import api from "~/utils/api";
+import TimeHeader from "./TimeHeader";
+import Background from "./Background";
+import useScheduleInfoPopup from "./controller/ScheduleInfoPopup";
 interface SchedulePosition extends CSSProperties {
   s?: number;
 }
@@ -18,18 +21,25 @@ function Calender({ event, mode }: { event: EventType; mode: Mode }) {
   const end = new Date(event.durationEnd);
   let day: number = start.getDay();
   const schedules = getSchedules();
-  const popup = useRef<HTMLDivElement>(null);
-  const isTarget = useRef<HTMLDivElement>(null);
+
   const duration = c.createDateArray(start, end, schedules);
   const dateColStart = useRef<number>(0);
   const createSchDiv = useRef<HTMLDivElement>(null);
   const tempSchedule = useRef<HTMLDivElement>(null);
+  /// 보이는 시간 설정
+  const [showHour, setShowHour] = useState<{ start: number; end: number }>({
+    start: 0,
+    end: 23,
+  });
   const [newSchedule, setNewSchedule] = useState<{
     start: string;
     end: string;
     duration: string;
     position: SchedulePosition;
   } | null>(null);
+
+  // 스케쥴 정보 팝업 컨트롤
+  const { Popup, popupCtlr, popupRef } = useScheduleInfoPopup();
 
   function getSchedules() {
     const schedules = [];
@@ -87,47 +97,46 @@ function Calender({ event, mode }: { event: EventType; mode: Mode }) {
     return res;
   }
 
-  function ctrlPopup(e: React.MouseEvent) {
-    e.preventDefault();
-    const target = e.target as HTMLDivElement;
-    if (!popup.current) return;
-    popup.current.style.top = `${e.clientY + 10}px`;
-    popup.current.style.left = `${e.clientX + 10}px`;
-    if (target.className !== "schedule") return;
+  // // function ctrlPopup(e: React.MouseEvent) {
+  // //   e.preventDefault();
+  // //   const target = e.target as HTMLDivElement;
+  // //   if (!popup.current) return;
+  // //   popup.current.style.top = `${e.clientY + 10}px`;
+  // //   popup.current.style.left = `${e.clientX + 10}px`;
+  // //   if (target.className !== "schedule") return;
 
-    if (!isTarget.current) {
-      isTarget.current = target;
-      console.log("show");
-      const start = target.getAttribute("data-start");
-      const end = target.getAttribute("data-end");
-      const user = target.getAttribute("data-user");
-      popup.current.innerHTML = `
-      <div class="popup">
-      <div class="popup-header">
-      <div class="header-block">${user}</div>
-      </div>
-      <div class="popup-content">
-      <div class="content-block">${start}</div>
-      <div class="content-block">${end}</div>
-      </div>
-      </div>
-      `;
-      popup.current.style.opacity = "1";
-    }
-  }
-  function onTargetLeave(e: React.MouseEvent) {
-    e.preventDefault();
-    if (!popup.current) return;
-    if (popup.current.style.opacity === "0") return;
-    isTarget.current = null;
-    setTimeout(() => {
-      if (!popup.current || isTarget.current) return;
-      popup.current.style.opacity = "0";
-    }, 100);
-  }
+  // //   if (!isTarget.current) {
+  // //     isTarget.current = target;
+  // //     console.log("show");
+  // //     const start = target.getAttribute("data-start");
+  // //     const end = target.getAttribute("data-end");
+  // //     const user = target.getAttribute("data-user");
+  // //     popup.current.innerHTML = `
+  // //     <div class="popup">
+  // //     <div class="popup-header">
+  // //     <div class="header-block">${user}</div>
+  // //     </div>
+  // //     <div class="popup-content">
+  // //     <div class="content-block">${start}</div>
+  // //     <div class="content-block">${end}</div>
+  // //     </div>
+  // //     </div>
+  // //     `;
+  // //     popup.current.style.opacity = "1";
+  // //   }
+  // // }
+  // function onTargetLeave(e: React.MouseEvent) {
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   if (!popup.current) return;
+  //   if (popup.current.style.opacity === "0") return;
+  //   isTarget.current = null;
+  //   popup.current.style.opacity = "0";
+  // }
 
   function addSchedule(e: React.MouseEvent) {
     e.preventDefault();
+    e.stopPropagation();
     if (!createSchDiv.current) return;
     const target = e.target as HTMLDivElement;
 
@@ -175,67 +184,57 @@ function Calender({ event, mode }: { event: EventType; mode: Mode }) {
 
   // check userData
   useEffect(() => {
-    popup.current = document.getElementById("schedule-popup") as HTMLDivElement;
-    popup.current.style.opacity = "0";
     let timediv = document.querySelector(".time:first-child") as HTMLDivElement;
     dateColStart.current =
       timediv?.getBoundingClientRect().x +
         timediv?.getBoundingClientRect().width || 0;
   }, []);
   return (
-    <div
-      className="table"
-      onMouseMove={(e) => mode === Mode.VIEW && ctrlPopup(e)}
-      onClick={addSchedule}
-    >
-      <div className="time-container">
-        <div className="time-header">
-          {start.getFullYear()}년{start.getMonth()}월
-        </div>
-        <div className="time-col">
-          {[...Array(24).keys()].map((i, key) => (
-            <div className="time" key={key}>
-              <p className="time-text">{i + 1}시</p>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="table" onClick={addSchedule}>
+      <TimeHeader startDate={start} showHour={showHour} />
       <div className="date-container">
-        <div className="date-background">
-          {[...Array(24).keys()].map((i, key) => (
-            <div className="time" key={key} data-hour={i}></div>
+        <Background showHour={showHour} />
+        <div className="date-col-header">
+          {duration.map((data, dkey) => (
+            <div className={`header-block`} key={dkey}>
+              {" " + data.date.getDate()}
+              {dayName[day++ % 7]}
+            </div>
           ))}
         </div>
-        {duration.map((data, dkey) => (
-          <div className="date-col" key={dkey}>
-            <div className={`header-block`}>
-              {dayName[day++ % 7]}
-              {" " + data.date.getDate()}
+        <div
+          className="date-col-container"
+          onMouseMove={(e) => mode === Mode.VIEW && popupCtlr.onMouseOver(e)}
+        >
+          {duration.map((data, dkey) => (
+            <div className="date-col" key={dkey}>
+              <div className="date" data-time={`${data.date.toDateString()}`}>
+                {data.schedules &&
+                  data.schedules.length > 0 &&
+                  data.schedules.map((sch, schKey) => (
+                    <div
+                      className={
+                        mode === Mode.VIEW ? "schedule" : "schedule-others"
+                      }
+                      key={schKey}
+                      style={{
+                        ...sch.position,
+                        opacity: 1 / event.participants.length,
+                      }}
+                      data-user={sch["data-user"]}
+                      data-start={sch["data-start"]}
+                      data-end={sch["data-end"]}
+                      onMouseLeave={(e) =>
+                        mode === Mode.VIEW && popupCtlr.onMouseLeave(e)
+                      }
+                    />
+                  ))}
+              </div>
             </div>
-            <div className="date" data-time={`${data.date.toDateString()}`}>
-              {data.schedules &&
-                data.schedules.length > 0 &&
-                data.schedules.map((sch, schKey) => (
-                  <div
-                    className={
-                      mode === Mode.VIEW ? "schedule" : "schedule-others"
-                    }
-                    key={schKey}
-                    style={{
-                      ...sch.position,
-                      opacity: 1 / event.participants.length,
-                    }}
-                    data-user={sch["data-user"]}
-                    data-start={sch["data-start"]}
-                    data-end={sch["data-end"]}
-                    onMouseOut={onTargetLeave}
-                  />
-                ))}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-      <div id="schedule-popup" ref={popup}></div>
+      <Popup />
       <div id="schedule-new" ref={createSchDiv}>
         <div className="popup-header">
           <h2>Create Schedule</h2>

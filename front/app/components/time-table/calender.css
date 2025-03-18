@@ -1,6 +1,4 @@
 .table {
-  scroll-behavior: smooth;
-  overflow-y: scroll;
   max-width: max-content;
   width: 100%;
   display: flex;
@@ -20,8 +18,27 @@
   user-select: none;
   width: max-content;
   display: flex;
+  flex-direction: column;
   position: relative;
   height: max-content;
+}
+
+.date-col-container {
+  scroll-behavior: smooth;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.date-col-header {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  left: 0;
+  top: 0;
+  z-index: 2;
 }
 
 .header-block,
@@ -32,7 +49,7 @@
   padding: 2px;
   justify-content: center;
   text-align: center;
-  display: sticky;
+  position: sticky;
 }
 .header-block {
   width: var(--date-w);
@@ -48,6 +65,13 @@
 }
 .date-col {
   width: var(--date-w);
+  position: relative;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  height: var(--content-h);
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 .date {
   border-left: 1px solid #000;
@@ -88,13 +112,13 @@
 
 .time {
   position: sticky;
-  border-bottom: 1px solid #000;
+  /* border-bottom: 1px solid #000; */
   height: var(--block-h);
   width: 100%;
 }
-.time:nth-child(3n) {
+/* .time:nth-child(3n) {
   border-bottom: 2px solid #000;
-}
+} */
 
 .time-text {
   position: relative;
@@ -109,7 +133,7 @@
   position: fixed;
   background-color: thistle;
   transition: opacity 0.3s ease-in;
-  opacity: 0;
+  /* opacity: 0; */
   top: -100%;
   left: -100%;
   z-index: 11;
